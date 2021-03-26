@@ -55,7 +55,11 @@ class Solver(object):
 		self.validation_period = config.validation_period
 
 		self.mode = config.mode
-		self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+		self.cuda_id = config.cuda_idx
+		#self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+		self.device = torch.device(f'cuda:{self.cuda_id}' if torch.cuda.is_available() else 'cpu')
+		if self.device.type == 'cuda':
+			print("GPU: {}".format(torch.cuda.get_device_name(self.cuda_id)), "/  Index: {}".format(self.cuda_id))
 		self.model_type = config.model_type
 		self.t = config.t
 		self.build_model()
