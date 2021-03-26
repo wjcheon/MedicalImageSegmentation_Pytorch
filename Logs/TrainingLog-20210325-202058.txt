@@ -588,3 +588,21 @@
 2021-03-25 20:21:16,911 911- 907012-DEBUG - findfont: score(<Font 'URW Gothic' (URWGothic-DemiOblique.otf) oblique normal demi normal>) = 11.24
 2021-03-25 20:21:16,911 911- 907012-DEBUG - findfont: score(<Font 'Chandas' (chandas1-2.ttf) normal normal 400 normal>) = 10.05
 2021-03-25 20:21:16,911 911- 907012-DEBUG - findfont: Matching sans\-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans ('/home/wjcheon/anaconda3/envs/imgseg/lib/python3.6/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000.
+2021-03-25 20:30:14,382 382- 907012-INFO - Epoch: 1 --- Training ACC:368.988, Test ACC:245.079, Training MSE:0.002, Test MSE:0.266
+2021-03-25 20:40:02,372 372- 907012-INFO - Epoch: 3 --- Training ACC:380.747, Test ACC:244.099, Training MSE:0.001, Test MSE:0.257
+2021-03-25 20:49:54,233 233- 907012-INFO - Epoch: 5 --- Training ACC:379.595, Test ACC:244.099, Training MSE:0.000, Test MSE:0.254
+2021-03-25 20:59:45,921 921- 907012-INFO - Epoch: 7 --- Training ACC:380.769, Test ACC:244.099, Training MSE:0.000, Test MSE:0.253
+2021-03-25 21:09:37,804 804- 907012-INFO - Epoch: 9 --- Training ACC:349.135, Test ACC:244.099, Training MSE:0.000, Test MSE:0.252
+2021-03-25 21:19:31,563 563- 907012-INFO - Epoch: 11 --- Training ACC:362.021, Test ACC:244.099, Training MSE:0.000, Test MSE:0.252
+2021-03-25 21:29:24,701 701- 907012-INFO - Epoch: 13 --- Training ACC:386.615, Test ACC:244.099, Training MSE:0.000, Test MSE:0.251
+2021-03-25 21:39:19,639 639- 907012-INFO - Epoch: 15 --- Training ACC:356.152, Test ACC:244.099, Training MSE:0.000, Test MSE:0.251
+2021-03-25 21:49:13,125 125- 907012-INFO - Epoch: 17 --- Training ACC:359.662, Test ACC:244.099, Training MSE:0.000, Test MSE:0.251
+2021-03-25 22:08:08,926 926- 907012-INFO - Epoch: 21 --- Training ACC:381.894, Test ACC:244.099, Training MSE:0.000, Test MSE:0.251
+2021-03-25 22:18:06,139 139- 907012-INFO - Epoch: 23 --- Training ACC:366.656, Test ACC:244.099, Training MSE:0.000, Test MSE:0.251
+2021-03-25 22:37:01,028 28- 907012-INFO - Epoch: 27 --- Training ACC:370.105, Test ACC:244.047, Training MSE:0.000, Test MSE:0.250
+2021-03-25 23:13:57,906 906- 907012-INFO - Epoch: 35 --- Training ACC:371.255, Test ACC:244.085, Training MSE:0.000, Test MSE:0.250
+2021-03-25 23:33:00,061 61- 907012-INFO - Epoch: 39 --- Training ACC:368.911, Test ACC:244.077, Training MSE:0.000, Test MSE:0.250
+2021-03-26 01:22:33,064 64- 907012-INFO - Epoch: 63 --- Training ACC:374.686, Test ACC:244.005, Training MSE:0.000, Test MSE:0.250
+2021-03-26 01:32:29,483 483- 907012-INFO - Epoch: 65 --- Training ACC:365.295, Test ACC:244.090, Training MSE:0.000, Test MSE:0.250
+2021-03-26 02:45:48,522 522- 907012-INFO - Epoch: 81 --- Training ACC:380.510, Test ACC:244.030, Training MSE:0.000, Test MSE:0.250
+2021-03-26 03:04:45,911 911- 907012-INFO - Epoch: 85 --- Training ACC:366.459, Test ACC:244.085, Training MSE:0.000, Test MSE:0.250
