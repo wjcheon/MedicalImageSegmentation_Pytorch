@@ -13,8 +13,13 @@ from torch.utils.tensorboard import SummaryWriter
 import csv
 import glob
 import tensorboardEye
-
 import logging
+import tkinter as tk
+from tkinter import filedialog
+
+
+
+
 
 timestr = time.strftime("%Y%m%d-%H%M%S")
 filenameLog = os.path.join('./Logs','TrainingLog-'+timestr+'.txt')
@@ -410,62 +415,75 @@ class Solver(object):
 	def test(self):
 		# wjcheon (212018)
 		#unet_path = os.path.join(self.model_path, '%s-%d-%.4f-%d-%.4f.pkl' %(self.model_type,self.num_epochs,self.lr,self.num_epochs_decay,self.augmentation_prob))
-		model_lists_for_load = glob.glob(os.path.join(self.model_path, '*.pkl'))
-		unet_path = model_lists_for_load[0]
+		root = tk.Tk()
+		root.withdraw()
 
-		#unet_path = os.path.join(self.model_path, )
+		model_path = filedialog.askopenfilename()
+		self.model_path = model_path
+		unet_path = self.model_path
+
+		pathname_selected = os.path.split(self.val_imgpath)[0]
+		filename_selected = 'test-'+os.path.split(self.val_imgpath)[-1]
+		independent_inference_locs = os.path.join(pathname_selected, filename_selected)
+
+
 		# U-Net Train
 		if os.path.isfile(unet_path):
 			# Load the pretrained Encoder
-			self.unet.load_state_dict(torch.load(unet_path))
-			print('%s is Successfully Loaded from %s'%(self.model_type,unet_path))
+			self.build_model()
 
-		self.build_model()
-		self.unet.load_state_dict(torch.load(unet_path))
+			checkpoint = torch.load(unet_path)
+			self.unet.load_state_dict(checkpoint['model_state_dict'])
+			self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+			trained_loss =  checkpoint['loss']
+			print('%s is Successfully Loaded from %s !! loss: %1.4f'%(self.model_type,unet_path, trained_loss))
 
-		self.unet.train(False)
-		self.unet.eval()
+		with torch.no_grad():
+			self.unet.eval()
 
-		acc = 0.  # Accuracy
-		SE = 0.  # Sensitivity (Recall)
-		SP = 0.  # Specificity
-		PC = 0.  # Precision
-		F1 = 0.  # F1 Score
-		JS = 0.  # Jaccard Similarity
-		DC = 0.  # Dice Coefficient
-		length = 0
-		for i, (images, GT) in enumerate(self.train_loader_val):
-			images = images.to(self.device)
-			GT = GT.to(self.device)
-			#SR = F.sigmoid(self.unet(images))
-			SR = torch.sigmoid(self.unet(images))
-			acc += get_accuracy(SR, GT)
-			SE += get_sensitivity(SR, GT)
-			SP += get_specificity(SR, GT)
-			PC += get_precision(SR, GT)
-			F1 += get_F1(SR, GT)
-			JS += get_JS(SR, GT)
-			DC += get_DC(SR, GT)
+			acc = 0.  # Accuracy
+			SE = 0.  # Sensitivity (Recall)
+			SP = 0.  # Specificity
+			PC = 0.  # Precision
+			F1 = 0.  # F1 Score
+			JS = 0.  # Jaccard Similarity
+			DC = 0.  # Dice Coefficient
+			MSE = 0.
+			length = 0
 
-			length += images.size(0)
+			for i, (images, GT) in enumerate(self.test_loader):
+				images = images.to(self.device)
+				GT = GT.to(self.device)
+				# SR = F.sigmoid(self.unet(images))
+				SR = torch.sigmoid(self.unet(images))
+				SR_probs = torch.sigmoid(SR)
+				SR_flat = SR_probs.view(SR_probs.size(0), -1)
+				GT_flat = GT.view(GT.size(0), -1)
 
-		acc = acc / length
-		SE = SE / length
-		SP = SP / length
-		PC = PC / length
-		F1 = F1 / length
-		JS = JS / length
-		DC = DC / length
-		unet_score = JS + DC
+				acc += get_accuracy(SR, GT)
+				SE += get_sensitivity(SR_flat, GT_flat)
+				SP += get_specificity(SR_flat, GT_flat)
+				PC += get_precision(SR_flat, GT_flat)
+				F1 += get_F1(SR_flat, GT_flat)
+				JS += get_JS(SR_flat, GT_flat)
+				DC += get_DC(SR_flat, GT_flat)
+				MSE += get_MSE(SR_flat, GT_flat)
 
-		f = open(os.path.join(self.result_path, 'result_testdata.csv'), 'a', encoding='utf-8', newline='')
-		wr = csv.writer(f)
+				length += images.size(0)
+
+
+
+
+				tensorboardEye.save_on_local(images, GT, SR, independent_inference_locs, i)
+
+		# f = open(os.path.join(self.result_path, 'result_testdata.csv'), 'a', encoding='utf-8', newline='')
+		# wr = csv.writer(f)
+		# # wr.writerow(
+		# # 	[self.model_type, acc, SE, SP, PC, F1, JS, DC, self.lr, best_epoch, self.num_epochs, self.num_epochs_decay,
+		# # 	 self.augmentation_prob])
 		# wr.writerow(
-		# 	[self.model_type, acc, SE, SP, PC, F1, JS, DC, self.lr, best_epoch, self.num_epochs, self.num_epochs_decay,
+		# 	[self.model_type, acc, SE, SP, PC, F1, JS, DC, self.lr, self.num_epochs, self.num_epochs_decay,
 		# 	 self.augmentation_prob])
-		wr.writerow(
-			[self.model_type, acc, SE, SP, PC, F1, JS, DC, self.lr, self.num_epochs, self.num_epochs_decay,
-			 self.augmentation_prob])
-		f.close()
+		# f.close()
 
 

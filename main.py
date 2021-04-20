@@ -82,14 +82,15 @@ if __name__ == '__main__':
     parser.add_argument('--currentCVNum', type=int, default=2)
 
     # misc
-    #parser.add_argument('--mode', type=str, default='test')
-    parser.add_argument('--mode', type=str, default='train')
-    parser.add_argument('--model_type', type=str, default='U_Net', help='U_Net/R2U_Net/AttU_Net/R2AttU_Net')
+    parser.add_argument('--mode', type=str, default='test')
+    #parser.add_argument('--mode', type=str, default='train')
+    parser.add_argument('--model_type', type=str, default='R2AttU_Net', help='U_Net/R2U_Net/AttU_Net/R2AttU_Net')
     parser.add_argument('--model_path', type=str, default='./models')   # path for saving model
     #parser.add_argument('--writer_path',type=str,default='runs/grapMap-1011-AdamMaXAug-SmothL1-Fullbatch-BS10-Trail3-beta0_5_CV{}_Writer'.format(1))
 
     #DB
-    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf')
+    #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf')
+    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf_SLIM')
     #
 
 

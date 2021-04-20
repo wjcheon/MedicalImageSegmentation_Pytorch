@@ -93,6 +93,10 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     plt.imshow(np.squeeze(sr[0]))
 
     #plt.show()
+    import os
+    if not os.path.exists(locs_):
+        os.makedirs(locs_)
+
     fileName = os.path.join(locs_, 'ValidationSet_' + str(_batch) + '.png')
     plt.savefig(fileName)
     plt.close()
