@@ -471,11 +471,8 @@ class Solver(object):
 
 				length += images.size(0)
 
-
-
-
 				tensorboardEye.save_on_local(images, GT, SR, independent_inference_locs, i)
-
+		print('Independent process was successfully done.')
 		# f = open(os.path.join(self.result_path, 'result_testdata.csv'), 'a', encoding='utf-8', newline='')
 		# wr = csv.writer(f)
 		# # wr.writerow(
