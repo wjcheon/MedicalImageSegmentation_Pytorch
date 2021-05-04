@@ -225,10 +225,14 @@ def get_loader_mat(image_path, batch_size, num_workers=2, kfold=1, currentCVNum=
 		tempFilenameGT = filesLists_dbGT[iter1]
 
 		trainXtemp = loadmat(tempFilenameInput)
-		trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
+		try:
+			trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
+			trainXtemp = np.swapaxes(trainXtemp, axis1=0, axis2=2)
+			trainXtemp = np.expand_dims(trainXtemp, axis=3)
+		except:
+			trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm_3channel"]
 		#trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm"]
-		trainXtemp = np.swapaxes(trainXtemp, axis1=0, axis2=2)
-		trainXtemp = np.expand_dims(trainXtemp, axis=3)
+
 
 		trainYtemp = loadmat(tempFilenameGT)
 		trainYtemp = trainYtemp["ntotalGrayMap_Oncologist_rot_HalfNHalf"]
@@ -258,10 +262,14 @@ def get_loader_mat(image_path, batch_size, num_workers=2, kfold=1, currentCVNum=
 		tempFilenameGT = filesLists_dbGT[iter1]
 
 		testXtemp = loadmat(tempFilenameInput)
-		testXtemp = testXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
-		#testXtemp = testXtemp["ctImagesData_rot_zeroNorm"]
-		testXtemp = np.swapaxes(testXtemp, axis1=0, axis2=2)
-		testXtemp = np.expand_dims(testXtemp, axis=3)
+
+		try:
+			testXtemp = testXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
+			#testXtemp = testXtemp["ctImagesData_rot_zeroNorm"]
+			testXtemp = np.swapaxes(testXtemp, axis1=0, axis2=2)
+			testXtemp = np.expand_dims(testXtemp, axis=3)
+		except:
+			testXtemp = testXtemp["ctImagesData_rot_zeroNorm_3channel"]
 
 		testYtemp = loadmat(tempFilenameGT)
 		testYtemp = testYtemp["ntotalGrayMap_Oncologist_rot_HalfNHalf"]
@@ -294,6 +302,17 @@ def get_loader_mat(image_path, batch_size, num_workers=2, kfold=1, currentCVNum=
 	# 	# transforms.RandomHorizontalFlip(),
 	# 	# transforms.ToTensor(),
 	# ])
+
+	# # visual debug for input and outpu
+	# sampleimg = np.squeeze(input_x[50])
+	# sampleimg = sampleimg[:,:,0]
+	# plt.figure()
+	# plt.imshow(sampleimg)
+	#
+	# sampleimg_gt = np.squeeze(output_gt[50])
+	# plt.figure()
+	# plt.imshow(sampleimg_gt)
+
 
 	albumentations_transform = albumentations.Compose([
 		# albumentations.Resize(256, 256),

@@ -45,6 +45,11 @@ def imshow_on_tensorboard(image_, gt_, sr_):
     '''
 
     image_cpu = image_.cpu().detach().numpy()
+    #print(np.shape(image_cpu))
+    if(np.shape(image_cpu)[1] > 1):
+        middle_idx = int(np.round((np.shape(image_cpu)[1]-1)/2))
+        image_cpu = image_cpu[:,middle_idx,:,:]
+    #print(np.shape(image_cpu))
     gt = gt_.cpu().detach().numpy()
     sr = sr_.cpu().detach().numpy()
     # plot the images in the batch, along with predicted and true labels
@@ -56,11 +61,11 @@ def imshow_on_tensorboard(image_, gt_, sr_):
     #
     ax2 = plt.subplot(1, 3, 2)
     ax2.set_title('Ground truth')
-    plt.imshow(np.squeeze(gt[0]))
+    plt.imshow(np.squeeze(gt[0]), vmin=0.0, vmax=1.0)
     #
     ax3 = plt.subplot(1, 3, 3)
     ax3.set_title('Prediction')
-    plt.imshow(np.squeeze(sr[0]))
+    plt.imshow(np.squeeze(sr[0]), vmin=0.0, vmax=1.0)
 
     #plt.show()
     return fig
@@ -74,7 +79,13 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     Uses the "images_to_probs" function.
     '''
 
+    #image_cpu = image_.cpu().detach().numpy()
     image_cpu = image_.cpu().detach().numpy()
+    # print(np.shape(image_cpu))
+    if (np.shape(image_cpu)[1] > 1):
+        middle_idx = int(np.round((np.shape(image_cpu)[1] - 1) / 2))
+        image_cpu = image_cpu[:, middle_idx, :, :]
+
     gt = gt_.cpu().detach().numpy()
     sr = sr_.cpu().detach().numpy()
     # plot the images in the batch, along with predicted and true labels
@@ -86,11 +97,11 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     #
     ax2 = plt.subplot(1, 3, 2)
     ax2.set_title('Ground truth')
-    plt.imshow(np.squeeze(gt[0]))
+    plt.imshow(np.squeeze(gt[0]), vmin=0.0, vmax=1.0)
     #
     ax3 = plt.subplot(1, 3, 3)
     ax3.set_title('Prediction')
-    plt.imshow(np.squeeze(sr[0]))
+    plt.imshow(np.squeeze(sr[0]), vmin=0.0, vmax=1.0)
 
     #plt.show()
     import os

@@ -18,9 +18,6 @@ import tkinter as tk
 from tkinter import filedialog
 
 
-
-
-
 timestr = time.strftime("%Y%m%d-%H%M%S")
 filenameLog = os.path.join('./Logs','TrainingLog-'+timestr+'.txt')
 filenameWriter = os.path.join('./runs','Writer-'+timestr) # This is directory name
@@ -84,13 +81,13 @@ class Solver(object):
 	def build_model(self):
 		"""Build generator and discriminator."""
 		if self.model_type =='U_Net':
-			self.unet = U_Net(img_ch=1,output_ch=1)
+			self.unet = U_Net(img_ch=self.img_ch,output_ch=1)
 		elif self.model_type =='R2U_Net':
-			self.unet = R2U_Net(img_ch=1,output_ch=1,t=self.t)
+			self.unet = R2U_Net(img_ch=self.img_ch,output_ch=1,t=self.t)
 		elif self.model_type =='AttU_Net':
-			self.unet = AttU_Net(img_ch=1,output_ch=1)
+			self.unet = AttU_Net(img_ch=self.img_ch,output_ch=1)
 		elif self.model_type == 'R2AttU_Net':
-			self.unet = R2AttU_Net(img_ch=1,output_ch=1,t=self.t)
+			self.unet = R2AttU_Net(img_ch=self.img_ch,output_ch=1,t=self.t)
 			
 
 		self.optimizer = optim.Adam(list(self.unet.parameters()),
