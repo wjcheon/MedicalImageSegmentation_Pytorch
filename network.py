@@ -160,6 +160,8 @@ class U_Net(nn.Module):
         self.Up_conv2 = conv_block(ch_in=128, ch_out=64)
 
         self.Conv_1x1 = nn.Conv2d(64,output_ch,kernel_size=1,stride=1,padding=0)
+        self.Conv_3x3 = nn.Conv2d(output_ch, output_ch, kernel_size=3, stride=1, padding=(1,1))
+        self.Conv_5x5 = nn.Conv2d(output_ch, output_ch, kernel_size=5, stride=1, padding=(2,2))
 
 
     def forward(self,x):
@@ -197,8 +199,11 @@ class U_Net(nn.Module):
         d2 = self.Up_conv2(d2)
 
         d1 = self.Conv_1x1(d2)
+        # Add 3x3, 5x5 convolution filter (21.52.23) by wjcheon
+        d1_2 = self.Conv_3x3(d1)
+        d1_3 = self.Conv_5x5(d1_2)
 
-        return d1
+        return d1_3
 
 
 class R2U_Net(nn.Module):

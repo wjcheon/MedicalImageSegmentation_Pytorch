@@ -209,6 +209,8 @@ def get_loader_mat(image_path, batch_size, num_workers=2, kfold=1, currentCVNum=
 		training_indexes["trainIndex_CV{0}".format(counter)] = train_index
 		test_indexes["testIndex_CV{0}".format(counter)] = test_index
 		counter = counter + 1
+		#print("trainIndex:{}".format(train_index))
+		#print("testIndex:{}".format(test_index))
 
 	trainingDicKey_list = list(training_indexes.keys())
 	trainingIndex_CV_F = training_indexes.get(trainingDicKey_list[currentCVNum-1])

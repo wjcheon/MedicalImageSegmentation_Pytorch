@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
+import numpy  as np
 
 
 def main(config):
@@ -37,7 +38,9 @@ def main(config):
 
     datapath_splited = str.split(config.data_path,'_')
     if (datapath_splited[-1] == '2.5D'):
-        config.img_ch = 3
+        #config.img_ch = 3
+        config.img_ch = 5
+        print("The number channel of input: {}".format(config.img_ch))
 
 
     print(config)
@@ -48,11 +51,11 @@ def main(config):
                                                kfold=config.kfold,
                                                currentCVNum=config.currentCVNum)
 
-
-
     solver = Solver(config, train_loader, test_loader)
 
-    
+
+
+
     # Train and sample the images
     if config.mode == 'train':
         solver.train()
@@ -85,7 +88,7 @@ if __name__ == '__main__':
     parser.add_argument('--val_imgpath', type=str, default='ResultValidationAsImage')
 
     parser.add_argument('--kfold', type=int, default=5)
-    parser.add_argument('--currentCVNum', type=int, default=2)
+    parser.add_argument('--currentCVNum', type=int, default=4) # start from 1
 
     # misc
     #parser.add_argument('--mode', type=str, default='test')
@@ -96,7 +99,7 @@ if __name__ == '__main__':
 
     #DB
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf')
-    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_2.5D')
+    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D')
 
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf_SLIM')
     #

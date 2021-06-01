@@ -38,7 +38,9 @@ class Solver(object):
 		self.img_ch = config.img_ch
 		self.output_ch = config.output_ch
 		#self.criterion = torch.nn.BCELoss()
-		self.criterion = torch.nn.MSELoss()
+		#self.criterion = torch.nn.MSELoss()
+		self.criterion = torch.nn.SmoothL1Loss(beta=0.5)
+
 		self.augmentation_prob = config.augmentation_prob
 
 		# Hyper-parameters
@@ -167,24 +169,23 @@ class Solver(object):
 				MSE = 0.
 				length = 0
 				#i, (image, GT) = self.train_loader.__iter__()
+				batchCounter=0
 				for i, (images, GT) in enumerate(self.train_loader):
 
 					images = images.to(self.device)
-					GT = GT.to(self.device)
-					SR = self.unet(images)
-					# GT : Ground Truth
-					# SR : Segmentation Result
-
-					#SR_probs = F.sigmoid(SR)
+					GT = GT.to(self.device) # GT : Ground Truth
+					SR = self.unet(images) # SR : Segmentation Result
 					SR_probs = torch.sigmoid(SR)
+
 					SR_flat = SR_probs.view(SR_probs.size(0),-1)
 					GT_flat = GT.view(GT.size(0),-1)
 					loss = self.criterion(SR_flat,GT_flat)
 					epoch_loss += loss.item()
 
 					# Visualization
+					# SR-> SR_probs: because SR_probs is final output for calculated loss fuctions.
 					writer.add_figure('predictions vs. actuals (train)',
-									  tensorboardEye.imshow_on_tensorboard(images,GT,SR),
+									  tensorboardEye.imshow_on_tensorboard(images,GT,SR_probs),
 									  global_step=totalEpoch)
 
 					# Backprop + optimize
@@ -201,16 +202,18 @@ class Solver(object):
 					DC += get_DC(SR_flat,GT_flat)
 					MSE += get_MSE(SR_flat,GT_flat)
 					length += images.size(0)
+					batchCounter +=1
+					#print("@Train, MSE: {0:.3f}, Accum.MSE: {1:.3f}, length: {2}".format(get_MSE(SR_flat,GT_flat), MSE, length))
 
 
-				acc = acc/length
-				SE = SE/length
-				SP = SP/length
-				PC = PC/length
-				F1 = F1/length
-				JS = JS/length
-				DC = DC/length
-				MSE = MSE/length
+				acc = acc/batchCounter
+				SE = SE/batchCounter
+				SP = SP/batchCounter
+				PC = PC/batchCounter
+				F1 = F1/batchCounter
+				JS = JS/batchCounter
+				DC = DC/batchCounter
+				MSE = MSE/batchCounter
 
 				trainingACC = acc
 				trainingMSE = MSE
@@ -250,13 +253,14 @@ class Solver(object):
 						MSE = 0.    # MSE
 
 						length=0
+						batchCounter =0
 						for i, (images, GT) in enumerate(self.test_loader):
 
 							images = images.to(self.device)
-							GT = GT.to(self.device)
-							#SR = F.sigmoid(self.unet(images))
-							SR = torch.sigmoid(self.unet(images))
+							GT = GT.to(self.device)  # GT : Ground Truth
+							SR = self.unet(images)  # SR : Segmentation Result
 							SR_probs = torch.sigmoid(SR)
+
 							SR_flat = SR_probs.view(SR_probs.size(0), -1)
 							GT_flat = GT.view(GT.size(0), -1)
 
@@ -270,20 +274,22 @@ class Solver(object):
 							MSE += get_MSE(SR_flat,GT_flat)
 
 							length += images.size(0)
+							batchCounter +=1
 
 							writer.add_figure('predictions vs. actuals (test)',
 											  tensorboardEye.imshow_on_tensorboard(images, GT, SR),
 											  global_step=totalEpoch)
-							tensorboardEye.save_on_local(images, GT, SR, self.val_imgpath, i)
+							tensorboardEye.save_on_local(images, GT, SR_probs, self.val_imgpath, i)
+							#print("@TEST, MSE: {0:.3f}, Accum.MSE: {1:.3f}, length: {2}".format(get_MSE(SR_flat, GT_flat), MSE, length))
 
-						acc = acc/length
-						SE = SE/length
-						SP = SP/length
-						PC = PC/length
-						F1 = F1/length
-						JS = JS/length
-						DC = DC/length
-						MSE = MSE/length
+						acc = acc/batchCounter
+						SE = SE/batchCounter
+						SP = SP/batchCounter
+						PC = PC/batchCounter
+						F1 = F1/batchCounter
+						JS = JS/batchCounter
+						DC = DC/batchCounter
+						MSE = MSE/batchCounter
 
 						# Score for records and save model parameters!
 						#unet_score = JS + DC
