@@ -83,7 +83,7 @@ class Solver(object):
 	def build_model(self):
 		"""Build generator and discriminator."""
 		if self.model_type =='U_Net':
-			self.unet = U_Net(img_ch=self.img_ch,output_ch=1)
+			self.unet = U_Net(img_ch=self.img_ch,output_ch=1) # Dropout (0.25) was added.
 		elif self.model_type =='R2U_Net':
 			self.unet = R2U_Net(img_ch=self.img_ch,output_ch=1,t=self.t)
 		elif self.model_type =='AttU_Net':

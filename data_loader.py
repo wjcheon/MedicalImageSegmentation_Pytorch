@@ -15,6 +15,7 @@ from torchvision import transforms
 import albumentations
 import albumentations.pytorch
 from matplotlib import pyplot as plt
+import copy
 
 
 from torch.utils import data
@@ -338,5 +339,154 @@ def get_loader_mat(image_path, batch_size, num_workers=2, kfold=1, currentCVNum=
 	return train_loader, test_loader
 
 
+def get_loader_mat_dropout(image_path_train, image_path_test, batch_size, num_workers=2):
+	# wjcheon
 
+	dbLocs = image_path_train
+	dbInput = os.path.join(dbLocs, 'Input')
+	dbGT = os.path.join(dbLocs, 'GT')
+	filesLists_dbInput = [os.path.join(dbInput, f) for f in os.listdir(dbInput) if
+						  os.path.isfile(os.path.join(dbInput, f))]
+	filesLists_dbGT = [os.path.join(dbGT, f) for f in os.listdir(dbGT) if os.path.isfile(os.path.join(dbGT, f))]
+	filesLists_dbInput.sort()
+	filesLists_dbGT.sort()
+
+	filesLists_dbGT_length = filesLists_dbInput.__len__()
+	rn = range(0, filesLists_dbGT_length)
+
+
+	input_x = []
+	output_gt = []
+
+	for iter1 in tqdm(rn):
+		# print(iter1)
+		tempFilenameInput = filesLists_dbInput[iter1]
+		tempFilenameGT = filesLists_dbGT[iter1]
+
+		trainXtemp = loadmat(tempFilenameInput)
+		try:
+			trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
+			trainXtemp = np.swapaxes(trainXtemp, axis1=0, axis2=2)
+			trainXtemp = np.expand_dims(trainXtemp, axis=3)
+		except:
+			trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm_3channel"]
+		#trainXtemp = trainXtemp["ctImagesData_rot_zeroNorm"]
+
+
+		trainYtemp = loadmat(tempFilenameGT)
+		trainYtemp = trainYtemp["ntotalGrayMap_Oncologist_rot_HalfNHalf"]
+		#trainYtemp = trainYtemp["ntotalGrayMap_Oncologist_rot"]
+		trainYtemp = np.swapaxes(trainYtemp, axis1=0, axis2=2)
+		trainYtemp = np.expand_dims(trainYtemp, axis=3)
+
+
+		input_x.extend(trainXtemp)
+		output_gt.extend(trainYtemp)
+
+	del trainXtemp
+	del trainYtemp
+
+	# Data (input, output) type was maintain as numpy.
+	#input_x = torch.tensor(input_x)
+	#output_gt = torch.tensor(output_gt)
+	# use FloatTensor
+	#input_x = torch.FloatTensor(input_x)
+	#output_gt = torch.FloatTensor(output_gt)
+
+	dbLocs_test = image_path_test
+	dbInput_test = os.path.join(dbLocs_test, 'Input')
+	dbGT_test = os.path.join(dbLocs_test, 'GT')
+	filesLists_dbInput_test = [os.path.join(dbInput_test, f) for f in os.listdir(dbInput_test) if
+						  os.path.isfile(os.path.join(dbInput_test, f))]
+	filesLists_dbGT_test = [os.path.join(dbGT_test, f) for f in os.listdir(dbGT_test) if os.path.isfile(os.path.join(dbGT_test, f))]
+	filesLists_dbInput_test.sort()
+	filesLists_dbGT_test.sort()
+
+	filesLists_dbGT_length_test = filesLists_dbInput_test.__len__()
+	rn_test = range(0, filesLists_dbGT_length_test)
+
+	input_x_k = []
+	output_gt_k = []
+	for iter1 in tqdm(rn_test):
+		# print(iter1)
+		tempFilenameInput = filesLists_dbInput_test[iter1]
+		tempFilenameGT = filesLists_dbGT_test[iter1]
+
+		testXtemp = loadmat(tempFilenameInput)
+
+		try:
+			testXtemp = testXtemp["ctImagesData_rot_zeroNorm_HalfNHalf"]
+			#testXtemp = testXtemp["ctImagesData_rot_zeroNorm"]
+			testXtemp = np.swapaxes(testXtemp, axis1=0, axis2=2)
+			testXtemp = np.expand_dims(testXtemp, axis=3)
+		except:
+			testXtemp = testXtemp["ctImagesData_rot_zeroNorm_3channel"]
+
+		testYtemp = loadmat(tempFilenameGT)
+		testYtemp = testYtemp["ntotalGrayMap_Oncologist_rot_HalfNHalf"]
+		#testYtemp = testYtemp["ntotalGrayMap_Oncologist_rot"]
+		testYtemp = np.swapaxes(testYtemp, axis1=0, axis2=2)
+		testYtemp = np.expand_dims(testYtemp, axis=3)
+
+		input_x_k.extend(testXtemp)
+		output_gt_k.extend(testYtemp)
+
+	del testXtemp
+	del testYtemp
+
+	print("Data is successfully loaded !!")
+	print("Train input:{}, Train gt:{}".format(np.shape(input_x), np.shape(output_gt)))
+	print("Test input:{}, Test gt:{}".format(np.shape(input_x_k), np.shape(output_gt_k)))
+
+
+	# Data (input, output) type was maintain as numpy.
+	# input_x_k = torch.FloatTensor(input_x_k)
+	# output_gt_k = torch.FloatTensor(output_gt_k)
+
+	# torchvision_transform = torchvision.transforms.Compose([
+	# 	transforms.RandomHorizontalFlip(),
+	# 	transforms.RandomRotation(20, resample=PIL.Image.BILINEAR),
+	# 	transforms.ToTensor()
+	#
+	# 	# transforms.Resize((256, 256)),
+	# 	# transforms.RandomCrop(224),
+	# 	# transforms.RandomHorizontalFlip(),
+	# 	# transforms.ToTensor(),
+	# ])
+
+	# # visual debug for input and outpu
+	# sampleimg = np.squeeze(input_x[50])
+	# sampleimg = sampleimg[:,:,0]
+	# plt.figure()
+	# plt.imshow(sampleimg)
+	#
+	# sampleimg_gt = np.squeeze(output_gt[50])
+	# plt.figure()
+	# plt.imshow(sampleimg_gt)
+
+
+	albumentations_transform = albumentations.Compose([
+		# albumentations.Resize(256, 256),
+		# albumentations.RandomCrop(224, 224),
+		albumentations.HorizontalFlip(),  # Same with transforms.RandomHorizontalFlip()
+		albumentations.Rotate(),
+		albumentations.pytorch.transforms.ToTensor()
+	])
+
+	albumentations_transform_testSet = albumentations.Compose([
+		# albumentations.Resize(256, 256),
+		# albumentations.RandomCrop(224, 224),
+		albumentations.pytorch.transforms.ToTensor()
+	])
+
+	train_dataset_transform = AlbumentationsDataset(tensors=(input_x, output_gt), transform=albumentations_transform)
+	train_loader = torch.utils.data.DataLoader(train_dataset_transform, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+	test_dataset_transform = AlbumentationsDataset(tensors=(input_x_k, output_gt_k), transform=albumentations_transform_testSet)
+	test_loader = torch.utils.data.DataLoader(test_dataset_transform, batch_size=1, shuffle=False, num_workers=num_workers)
+
+	return train_loader, test_loader
+
+
+
+##
 

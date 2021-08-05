@@ -2,7 +2,7 @@ from sklearn.model_selection import KFold
 import argparse
 import os
 from solver import Solver
-from data_loader import get_loader, get_loader_mat
+from data_loader import get_loader, get_loader_mat, get_loader_mat_dropout
 from torch.backends import cudnn
 import random
 import matplotlib.pyplot as plt
@@ -44,12 +44,18 @@ def main(config):
 
 
     print(config)
+    # k fold validation
+    # train_loader, test_loader = get_loader_mat(image_path=config.data_path,
+    #                                            batch_size=config.batch_size,
+    #                                            num_workers=config.num_workers,
+    #                                            kfold=config.kfold,
+    #                                            currentCVNum=config.currentCVNum)
 
-    train_loader, test_loader = get_loader_mat(image_path=config.data_path,
+    # Dropout instead of k fold validation
+    train_loader, test_loader = get_loader_mat_dropout(image_path_train=config.data_path,
+                                                image_path_test= config.data_path_test,
                                                batch_size=config.batch_size,
-                                               num_workers=config.num_workers,
-                                               kfold=config.kfold,
-                                               currentCVNum=config.currentCVNum)
+                                               num_workers=config.num_workers)
 
     solver = Solver(config, train_loader, test_loader)
 
@@ -71,7 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('--t', type=int, default=3, help='t for Recurrent step of R2U_Net or R2AttU_Net')
     
     # training hyper-parameters
-    parser.add_argument('--img_ch', type=int, default=1)
+    parser.add_argument('--img_ch', type=int, default=5)
     parser.add_argument('--output_ch', type=int, default=1)
     parser.add_argument('--num_epochs', type=int, default=2000)
     parser.add_argument('--num_epochs_decay', type=int, default=70)
@@ -99,7 +105,9 @@ if __name__ == '__main__':
 
     #DB
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf')
-    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D')
+    #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D')
+    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D_paperF_Train')
+    parser.add_argument('--data_path_test', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D_paperF_Test')
 
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf_SLIM')
     #

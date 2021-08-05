@@ -163,6 +163,8 @@ class U_Net(nn.Module):
         self.Conv_3x3 = nn.Conv2d(output_ch, output_ch, kernel_size=3, stride=1, padding=(1,1))
         self.Conv_5x5 = nn.Conv2d(output_ch, output_ch, kernel_size=5, stride=1, padding=(2,2))
 
+        self.dropout = nn.Dropout(0.25)
+
 
     def forward(self,x):
         # encoding path
@@ -176,19 +178,23 @@ class U_Net(nn.Module):
 
         x4 = self.Maxpool(x3)
         x4 = self.Conv4(x4)
+        x4 = self.dropout(x4)
 
         x5 = self.Maxpool(x4)
         x5 = self.Conv5(x5)
+        x5 = self.dropout(x5)
 
         # decoding + concat path
         d5 = self.Up5(x5)
         d5 = torch.cat((x4,d5),dim=1)
         
         d5 = self.Up_conv5(d5)
+        d5 = self.dropout(d5)
         
         d4 = self.Up4(d5)
         d4 = torch.cat((x3,d4),dim=1)
         d4 = self.Up_conv4(d4)
+        d4 = self.dropout(d4)
 
         d3 = self.Up3(d4)
         d3 = torch.cat((x2,d3),dim=1)

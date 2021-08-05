@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.io import savemat
 import os
 def images_to_probs(net, train_x_):
     '''
@@ -90,18 +91,22 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     sr = sr_.cpu().detach().numpy()
     # plot the images in the batch, along with predicted and true labels
 
+    input_temp = np.squeeze(image_cpu[0])
+    gt_temp =np.squeeze(gt[0])
+    prediction_temp =np.squeeze(sr[0])
+
     fig =  plt.figure()
     ax1 = plt.subplot(1, 3, 1)
     ax1.set_title('Input')
-    plt.imshow(np.squeeze(image_cpu[0]))
+    plt.imshow(input_temp)
     #
     ax2 = plt.subplot(1, 3, 2)
     ax2.set_title('Ground truth')
-    plt.imshow(np.squeeze(gt[0]), vmin=0.0, vmax=1.0)
+    plt.imshow(gt_temp, vmin=0.0, vmax=1.0)
     #
     ax3 = plt.subplot(1, 3, 3)
     ax3.set_title('Prediction')
-    plt.imshow(np.squeeze(sr[0]), vmin=0.0, vmax=1.0)
+    plt.imshow(prediction_temp, vmin=0.0, vmax=1.0)
 
     #plt.show()
     import os
@@ -111,4 +116,10 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     fileName = os.path.join(locs_, 'ValidationSet_' + str(_batch) + '.png')
     plt.savefig(fileName)
     plt.close()
+
+    # Save as *.mat file (21.08.05)
+    saveDic = {"input":input_temp, "gt":gt_temp, "pr":prediction_temp}
+    fileNameMat = os.path.join(locs_, 'ValidationSet_' + str(_batch) + '.mat')
+    savemat(fileNameMat, saveDic)
+
     return
