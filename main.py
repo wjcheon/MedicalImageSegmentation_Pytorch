@@ -51,7 +51,7 @@ def main(config):
     #                                            kfold=config.kfold,
     #                                            currentCVNum=config.currentCVNum)
 
-    # Dropout instead of k fold validation
+    # # Dropout instead of k fold validation
     train_loader, test_loader = get_loader_mat_dropout(image_path_train=config.data_path,
                                                 image_path_test= config.data_path_test,
                                                batch_size=config.batch_size,
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=int, default=2000)
     parser.add_argument('--num_epochs_decay', type=int, default=70)
     parser.add_argument('--validation_period', type=int, default=2)
-    parser.add_argument('--batch_size', type=int, default=2)
+    parser.add_argument('--batch_size', type=int, default=3)
     parser.add_argument('--num_workers', type=int, default=1)
     parser.add_argument('--lr', type=float, default=0.0002)
     parser.add_argument('--beta1', type=float, default=0.5)        # momentum1 in Adam
@@ -106,8 +106,8 @@ if __name__ == '__main__':
     #DB
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf')
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D')
-    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D_paperF_Train')
-    parser.add_argument('--data_path_test', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D_paperF_Test')
+    parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D-Train-CV2')
+    parser.add_argument('--data_path_test', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalFNHalF_5slices_GTV1_corrected_2.5D-Test-CV2')
 
     #parser.add_argument('--data_path', type=str, default='/home/shared/DB/NSCLC/DB_NSCLC_HalfNHalf_SLIM')
     #

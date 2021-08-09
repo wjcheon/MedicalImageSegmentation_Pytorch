@@ -113,13 +113,13 @@ def save_on_local(image_, gt_, sr_, locs_, _batch):
     if not os.path.exists(locs_):
         os.makedirs(locs_)
 
-    fileName = os.path.join(locs_, 'ValidationSet_' + str(_batch) + '.png')
+    fileName = os.path.join(locs_, 'ValidationSet_' + "{0:03}".foramt(_batch) + '.png')
     plt.savefig(fileName)
     plt.close()
 
     # Save as *.mat file (21.08.05)
     saveDic = {"input":input_temp, "gt":gt_temp, "pr":prediction_temp}
-    fileNameMat = os.path.join(locs_, 'ValidationSet_' + str(_batch) + '.mat')
+    fileNameMat = os.path.join(locs_, 'ValidationSet_' + "{0:03}".foramt(_batch) + '.mat')
     savemat(fileNameMat, saveDic)
 
     return
